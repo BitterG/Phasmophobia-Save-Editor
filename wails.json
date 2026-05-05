@@ -1,0 +1,13 @@
+{
+  "$schema": "https://wails.io/schemas/config.v2.json",
+  "name": "Phasmophobia Save Editor",
+  "outputfilename": "Phasmophobia Save Editor",
+  "frontend:install": "npm install",
+  "frontend:build": "npm run build",
+  "frontend:dev:watcher": "npm run dev",
+  "frontend:dev:serverUrl": "auto",
+  "author": {
+    "name": "苦瓜",
+    "email": "11513458+gourd_bitter@user.noreply.gitee.com"
+  }
+}
