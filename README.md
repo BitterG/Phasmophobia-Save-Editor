@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="build/appicon.ico" width="128" />
+  <img src="build/appicon.png" width="128" />
 </p>
 # Phasmophobia 存档修改器
 
