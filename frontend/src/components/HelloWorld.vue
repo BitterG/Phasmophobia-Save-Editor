@@ -239,7 +239,7 @@ function showStatus(msg, type) {
           <div class="card-header">
             <span class="card-icon">🌟</span>
             <span class="card-label">转生等级</span>
-            <span class="card-range">0 ~ 20</span>
+            <span class="card-range">0 ~ 3999</span>
           </div>
           <div class="card-value">
             <RollNumber :value="saveData.rebirthLevel" />
@@ -249,9 +249,9 @@ function showStatus(msg, type) {
               v-model="editData.rebirthLevel"
               type="number"
               min="0"
-              max="20"
+              max="3999"
               class="edit-input"
-              placeholder="0 ~ 20"
+              placeholder="0 ~ 3999"
             />
           </div>
         </div>
@@ -283,7 +283,7 @@ function showStatus(msg, type) {
           <div class="card-header">
             <span class="card-icon">💰</span>
             <span class="card-label">金币</span>
-            <span class="card-range">0 ~ 9,999,999</span>
+            <span class="card-range">0 ~ 999,999,999</span>
           </div>
           <div class="card-value">
             <RollNumber :value="saveData.gold" :locale="true" />
@@ -293,9 +293,9 @@ function showStatus(msg, type) {
               v-model="editData.gold"
               type="number"
               min="0"
-              max="9999999"
+              max="999999999"
               class="edit-input"
-              placeholder="0 ~ 9999999"
+              placeholder="0 ~ 999999999"
             />
           </div>
         </div>

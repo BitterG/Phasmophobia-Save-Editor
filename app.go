@@ -23,8 +23,9 @@ type App struct {
 	ctx context.Context
 
 	// 内部状态，对应 Python 全局变量 orginStr / json_obj
-	originStr string
-	jsonObj   map[string]interface{}
+	originStr   string
+	itemsOrigin string
+	jsonObj     map[string]interface{}
 }
 
 // NewApp creates a new App application struct
@@ -84,15 +85,22 @@ func (a *App) LoadSave() (SaveData, error) {
 
 	strJSON := string(decData)
 
+	// 提取并替换 Items 非标准 JSON（对象作为 key），保留原始内容用于还原
+	fixedJSON, itemsOrigin, err := extractAndReplaceItems(strJSON)
+	if err != nil {
+		return SaveData{}, fmt.Errorf("提取 Items 失败: %w", err)
+	}
+	a.itemsOrigin = itemsOrigin
+
 	// 提取 playedMaps.value 原始内容（保留用于还原）
-	origin, err := getOriginStr(strJSON)
+	origin, err := getOriginStr(fixedJSON)
 	if err != nil {
 		return SaveData{}, fmt.Errorf("提取 playedMaps 失败: %w", err)
 	}
 	a.originStr = origin
 
 	// 将 playedMaps.value 替换为占位符，使 JSON 可被标准解析
-	fixedJSON, err := correctionJSON(strJSON)
+	fixedJSON, err = correctionJSON(fixedJSON)
 	if err != nil {
 		return SaveData{}, fmt.Errorf("修正 JSON 失败: %w", err)
 	}
@@ -122,14 +130,14 @@ func (a *App) ApplySave(data SaveData) error {
 	}
 
 	// 校验范围（对应 Python 各 branch 的范围检查）
-	if data.RebirthLevel < 0 || data.RebirthLevel > 20 {
-		return fmt.Errorf("转生等级必须在 0-20 之间")
+	if data.RebirthLevel < 0 || data.RebirthLevel > 3999 {
+		return fmt.Errorf("转生等级必须在 0-3999 之间")
 	}
 	if data.Level < 1 || data.Level > 9999 {
 		return fmt.Errorf("等级必须在 1-9999 之间")
 	}
-	if data.Gold < 0 || data.Gold > 9999999 {
-		return fmt.Errorf("金币必须在 0-9999999 之间")
+	if data.Gold < 0 || data.Gold > 999999999 {
+		return fmt.Errorf("金币必须在 0-999999999 之间")
 	}
 
 	// 修改 json_obj 中对应字段的 value
@@ -143,8 +151,11 @@ func (a *App) ApplySave(data SaveData) error {
 		return fmt.Errorf("序列化 JSON 失败: %w", err)
 	}
 
+	// 还原 Items 占位符为原始内容
+	finalStr := restoreItems(string(jsonBytes), a.itemsOrigin)
+
 	// 还原 playedMaps.value 占位符为原始内容
-	finalStr := recoverJSON2Str(string(jsonBytes), a.originStr)
+	finalStr = recoverJSON2Str(finalStr, a.originStr)
 
 	// AES-CBC 加密
 	encData, err := es3Encrypt([]byte(finalStr), saveKey)
